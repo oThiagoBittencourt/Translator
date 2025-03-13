@@ -1,6 +1,5 @@
 import mss
 import pyautogui
-import keyboard
 import cv2 as cv
 import numpy as np
 
@@ -36,23 +35,19 @@ def image_to_text(image, monitor):
 # Processo de captura de tela e tratamento de imagem
 def get_image():
     w, h = pyautogui.size()
-    print("PIL Screen Capture Speed Test")
-    print("Screen Resolution: " + str(w) + 'x' + str(h))
     monitor = {"top": 0, "left": 0, "width": w, "height": h}
 
     img = None
 
     with mss.mss() as sct:
-        while True:
-            print("Pressione 'Enter' para continuar...")
-            keyboard.wait('Enter')
-
-            image = sct.grab(monitor)
-            image = np.array(image)
-            gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-            _, img_thresh = cv.threshold(gray, 150, 255, cv.THRESH_BINARY)
-            text = image_to_text(img_thresh, monitor)
-            result = translate_text(text)
-            print(result)
-
-get_image()
+        image = sct.grab(monitor)
+        image = np.array(image)
+        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        _, img_thresh = cv.threshold(gray, 150, 255, cv.THRESH_BINARY)
+        return {'image': img_thresh, 'monitor': monitor}
+    
+def translate():
+    image = get_image()
+    text = image_to_text(image['image'], image['monitor'])
+    result = translate_text(text)
+    return result
